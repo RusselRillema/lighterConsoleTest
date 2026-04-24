@@ -57,7 +57,7 @@ public class AddressInfoFetcher
         throw new Exception("Lighter Account Index not found.");
     }
 
-    public async Task<short> GetApiKeyIndexAsync(long accountIndex, CancellationToken cancellationToken = default)
+    public async Task<short> GetApiKeyIndexAsync(long accountIndex,string apiPublicKey, CancellationToken cancellationToken = default)
     {
         var endpoint = $"/api/v1/apikeys?account_index={accountIndex}";
         using var response = await _httpClient.GetAsync(endpoint, cancellationToken);
@@ -65,11 +65,15 @@ public class AddressInfoFetcher
 
         var apiKeysInfo = await response.Content.ReadFromJsonAsync<Models.LighterApiKeysInfo>(_jsonSerializerOptions, cancellationToken);
         if (apiKeysInfo?.ApiKeys == null || apiKeysInfo.ApiKeys.Count == 0)
-        {
             throw new Exception("Lighter Api Key Index not found.");
+        
+        foreach (var apiKey in apiKeysInfo.ApiKeys)
+        {
+            if(apiKey.PublicKey == apiPublicKey)
+                return apiKey.ApiKeyIndex;
         }
 
-        return apiKeysInfo.ApiKeys[0].ApiKeyIndex;
+        throw new Exception("Lighter Api Key Index not found.");
     }
 
     public async Task<string> GetDepositHistoryAsync(

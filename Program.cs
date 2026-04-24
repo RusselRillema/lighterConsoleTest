@@ -15,6 +15,7 @@ string layer1Address;
 string url;
 int chainId;
 string keySecret;
+string keyPublic;
 
 void WriteDebugLine(string message)
 {
@@ -34,7 +35,8 @@ if (File.Exists(localConfigPath))
 
     if (config is null ||
         string.IsNullOrWhiteSpace(config.l1address) ||
-        string.IsNullOrWhiteSpace(config.apiSecret))
+        string.IsNullOrWhiteSpace(config.apiSecret) ||
+        string.IsNullOrWhiteSpace(config.apiPublic))
     {
         throw new InvalidOperationException(
             $"Invalid config in '{localConfigPath}'. 'l1address' and 'apiSecret' are required.");
@@ -42,6 +44,7 @@ if (File.Exists(localConfigPath))
 
     layer1Address = config.l1address;
     keySecret = config.apiSecret;
+    keyPublic = config.apiPublic;
     url = string.IsNullOrWhiteSpace(config.url) ? defaultUrl : config.url;
     chainId = config.chainId ?? defaultChainId;
 
@@ -105,11 +108,25 @@ else
 
         WriteDebugLine("keySecret is required.");
     }
+
+    while (true)
+    {
+        WriteDebugLine("Enter keyPublic:");
+        var keyPublicInput = Console.ReadLine();
+
+        if (!string.IsNullOrWhiteSpace(keyPublicInput))
+        {
+            keyPublic = keyPublicInput;
+            break;
+        }
+
+        WriteDebugLine("keyPublic is required.");
+    }
 }
 
 var addressInfoFetcher = new AddressInfoFetcher(layer1Address, url);
 long accountIndex = await addressInfoFetcher.GetAccountIndexAsync();
-short apiKeyIndex = await addressInfoFetcher.GetApiKeyIndexAsync(accountIndex);
+short apiKeyIndex = await addressInfoFetcher.GetApiKeyIndexAsync(accountIndex, keyPublic);
 
 WriteDebugLine($"AccountIndex: {accountIndex}");
 WriteDebugLine($"ApiKeyIndex: {apiKeyIndex}");
@@ -188,6 +205,7 @@ sealed class LocalTestConfig
 {
     public string? l1address { get; set; }
     public string? apiSecret { get; set; }
+    public string? apiPublic { get; set; }
     public string? url { get; set; }
     public int? chainId { get; set; }
 }
