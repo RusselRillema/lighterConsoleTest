@@ -21,10 +21,10 @@ public class Models
         [JsonPropertyName("account_trading_mode")] public int AccountTradingMode { get; set; }
         [JsonPropertyName("index")] public long Index { get; set; }
         [JsonPropertyName("l1_address")] public string L1Address { get; set; }
-        [JsonPropertyName("cancel_all_time")] public string CancelAllTime { get; set; }
-        [JsonPropertyName("total_order_count")] public string TotalOrderCount { get; set; }
-        [JsonPropertyName("total_isolated_order_count")] public string TotalIsolatedOrderCount { get; set; }
-        [JsonPropertyName("pending_order_count")] public string PendingOrderCount { get; set; }
+        [JsonPropertyName("cancel_all_time")] public long? CancelAllTime { get; set; }
+        [JsonPropertyName("total_order_count")] public long? TotalOrderCount { get; set; }
+        [JsonPropertyName("total_isolated_order_count")] public long? TotalIsolatedOrderCount { get; set; }
+        [JsonPropertyName("pending_order_count")] public long? PendingOrderCount { get; set; }
         [JsonPropertyName("available_balance")] public string AvailableBalance { get; set; }
         [JsonPropertyName("status")] public string Status { get; set; }
         [JsonPropertyName("collateral")] public string Collateral { get; set; }

@@ -17,6 +17,12 @@ public static class LighterNativeLinux
         public IntPtr Err;
     }
 
+    internal sealed class ManagedStrOrErr
+    {
+        public string? Str { get; init; }
+        public string? Err { get; init; }
+    }
+    
     /// <summary>
     /// Mirrors:
     /// typedef struct { uint8_t txType; char* txInfo; char* txHash;
