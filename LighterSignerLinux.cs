@@ -37,7 +37,7 @@ public static class LighterSignerLinux
         string url,
         string privateKey,
         int chainId,
-        int apiKeyIndex,
+        byte apiKeyIndex,
         long accountIndex, 
         bool printDebug = false)
     {
