@@ -5,7 +5,7 @@ namespace LighterTest;
 
 public static class LighterNativeLinux
 {
-    public const string DllName = "/home/russel/github/lighter-go/build/lighter-signer-linux-amd64.so";
+   public const string DllName = "lighter-signer-linux.so";
 
     // ── Native structs (must mirror the CGO C struct layout exactly) ────
 
@@ -91,6 +91,9 @@ public static class LighterNativeLinux
         int cChainId,
         int cApiKeyIndex,
         long cAccountIndex);
+
+    [DllImport(DllName, EntryPoint = "InitSignerThread", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void InitSignerThread();
 
     [DllImport(DllName, EntryPoint = "CheckClient", CallingConvention = CallingConvention.Cdecl)]
     internal static extern IntPtr CheckClient(

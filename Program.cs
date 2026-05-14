@@ -3,7 +3,7 @@ using LighterTest;
 using System.Text.Json;
 
 
-NativeLibrary.Load(LighterNativeLinux.DllName);
+//NativeLibrary.Load(LighterNativeLinux.DllName);
 
 try
 {
@@ -22,6 +22,7 @@ try
     int chainId;
     string keySecret;
     string keyPublic;
+    bool linuxTest = System.OperatingSystem.IsLinux();//false will test windows signer
 
     void WriteDebugLine(string message)
     {
@@ -140,19 +141,26 @@ try
 
     string token = "";
     var expiryTime = DateTime.UtcNow.AddSeconds(28200); //7 hours and 50 minutes
-    long deadline = Convert.ToInt64((expiryTime - new DateTime(1970, 01, 01)).TotalSeconds); 
+    long deadline = Convert.ToInt64((expiryTime - new DateTime(1970, 01, 01)).TotalSeconds);
     try
     {
-        _ = Task.Run(async () =>
+        if (linuxTest)
         {
             var client = LighterSignerLinux.CreateClient(url, keySecret, chainId, (byte)apiKeyIndex, accountIndex);
+            LighterSignerLinux.InitSignerThread();
             token = LighterSignerLinux.CreateAuthToken(deadline, apiKeyIndex, accountIndex);
-            Console.WriteLine(token);
-        });
+        }
+        else
+        {
+            var client = LighterSignerWindows.CreateClient(url, keySecret, chainId, (byte)apiKeyIndex, accountIndex);
+            token = LighterSignerWindows.CreateAuthToken(deadline, apiKeyIndex, accountIndex);
+        }
+        Console.WriteLine("Generated Auth Token:");
+        Console.WriteLine(token);
     }
     catch (Exception e)
     {
-        Console.WriteLine(e);
+        Console.WriteLine($"Caught exception while attempting to generate auth token: {e}");
         throw;
     }
 
@@ -165,8 +173,9 @@ try
 
     try
     {
+        Console.WriteLine($"Testing endpoint - DepositHistory:");
         var depositHistory = await addressInfoFetcher.GetDepositHistoryAsync(accountIndex, token);
-        WriteDebugLine($"DepositHistory: {depositHistory}");
+        Console.WriteLine($"DepositHistory: {depositHistory}");
     }
     catch (Exception e)
     {
@@ -178,38 +187,33 @@ try
 
     _ = Task.Run(async () =>
     {
-        while (true)
+        try
         {
-            await Task.Delay(5000);
-            Console.WriteLine($"Still running {count++}...");
-
-            if (count % 10 == 0)
+            while (true)
             {
-                Console.WriteLine("Recreating token...");
-                token = LighterSignerLinux.CreateAuthToken(deadline, apiKeyIndex, accountIndex);
-                Console.WriteLine(token);
+                await Task.Delay(1000);
+                Console.WriteLine($"Still running {count++}...");
+                if (count % 10 == 0)
+                {
+                    Console.WriteLine("Recreating token...");
+                    if (linuxTest)
+                    {
+                        LighterSignerLinux.InitSignerThread();
+                        token = LighterSignerLinux.CreateAuthToken(deadline, apiKeyIndex, accountIndex);
+                    }
+                    else
+                    {
+                        token = LighterSignerWindows.CreateAuthToken(deadline, apiKeyIndex, accountIndex);
+                    }
+                    Console.WriteLine(token);
+                }
             }
         }
-    });
-
-    for (int i = 0; i < 20; i++)
-    {
-        _ = Task.Run(() =>
+        catch (Exception ex)
         {
-            int number = 2; // start with the first prime candidate
-            List<int> primes = new List<int>();
-            List<int> notPrimes = new List<int>();
-            while (true) // infinite loop, you can add a break condition if needed
-            {
-                if (IsPrime(number))
-                    primes.Add(number);
-                else
-                    notPrimes.Add(number);
-
-                number++;
-            }
-        });
-    }
+            Console.WriteLine($"Caught exception while attempting to generate auth token on background thread: {ex}");
+        }
+    });
 
     static bool IsPrime(int n)
     {
@@ -227,14 +231,45 @@ try
         return true;
     }
 
-    while (true) ;
-}
-catch (Exception e)
-{
-    Console.WriteLine(e);
-}
+    for (int i = 0; i < 10; i++)
+    {
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                int number = 2;
+                List<int> primes = new List<int>();
+                List<int> notPrimes = new List<int>();
+                while (true)
+                {
+                    if (IsPrime(number))
+                        primes.Add(number);
+                    else
+                        notPrimes.Add(number);
+                    number++;
+                }
+            }
+            catch (Exception e)
+            {
+                //Ensure an exception in one of these calculations doesn't crash the app
+                Console.WriteLine($"Caught exception in calculation: {e}");
+            }
+        });
+    }
 
-Console.WriteLine("Exited");
+    while (true)
+    {
+        Console.WriteLine($"\nTest app will continue testing the signer background.\nYou may press any key to close the app early.\n");
+        var input = Console.ReadLine();
+
+        if (input != null)
+            break;
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Caught exception in console test: {ex}");
+}
 
 sealed class LocalTestConfig
 {

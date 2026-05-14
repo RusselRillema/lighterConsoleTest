@@ -82,10 +82,14 @@ public static class LighterSignerLinux
         return managed.Str;
     }
     
+    public static void InitSignerThread()
+    {
+        LighterNativeLinux.InitSignerThread();
+    }
+
     private static void Free(IntPtr ptr)
     {
-        //Console.WriteLine($"Free: {ptr} - Start");
+        LighterNativeLinux.InitSignerThread();
         LighterNativeLinux.Free(ptr);
-        //Console.WriteLine($"Free: {ptr} - End");
     }
 }
