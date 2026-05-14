@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
 
 namespace LighterTest
 {
-    internal class LighterNative
+    internal class LighterNativeWindows
     {
         internal const string DllName = "lighter-signer-windows-amd64.dll";
 
@@ -343,7 +338,7 @@ namespace LighterTest
         public uint TriggerPrice;
         public long OrderExpiry;
 
-        internal LighterNative.CreateOrderTxReq ToNative() => new LighterNative.CreateOrderTxReq
+        internal LighterNativeWindows.CreateOrderTxReq ToNative() => new LighterNativeWindows.CreateOrderTxReq
         {
             MarketIndex = MarketIndex,
             ClientOrderIndex = ClientOrderIndex,

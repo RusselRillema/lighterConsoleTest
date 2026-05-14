@@ -22,18 +22,19 @@ try
     int chainId;
     string keySecret;
     string keyPublic;
-    bool linuxTest = System.OperatingSystem.IsLinux();//false will test windows signer
+    bool linuxTest = System.OperatingSystem.IsLinux();
 
-    void WriteDebugLine(string message)
+    if (linuxTest)
     {
-        if (!returnTokenOnly)
-        {
-            Console.WriteLine(message);
-        }
+        Console.WriteLine("Running singer test for Linux.");
+        Console.WriteLine($"Expected Dll name: {LighterNativeLinux.DllName}.");
     }
-
-    WriteDebugLine(LighterNativeLinux.DllName);
-    WriteDebugLine(Environment.Is64BitProcess.ToString());
+    else
+    {
+        Console.WriteLine("Running singer test for Windows.");
+        Console.WriteLine($"Expected Dll name: {LighterNativeWindows.DllName}.");
+    }
+    Console.WriteLine($"Is 64 bit proccess: {Environment.Is64BitProcess}.\n\n");
 
     if (File.Exists(localConfigPath))
     {
@@ -215,22 +216,6 @@ try
         }
     });
 
-    static bool IsPrime(int n)
-    {
-        if (n < 2) return false;
-        if (n == 2) return true;
-        if (n % 2 == 0) return false;
-
-        int boundary = (int)Math.Sqrt(n);
-
-        for (int i = 3; i <= boundary; i += 2)
-        {
-            if (n % i == 0) return false;
-        }
-
-        return true;
-    }
-
     for (int i = 0; i < 10; i++)
     {
         _ = Task.Run(() =>
@@ -265,6 +250,33 @@ try
         if (input != null)
             break;
     }
+
+    #region Helper methods
+    void WriteDebugLine(string message)
+    {
+        if (!returnTokenOnly)
+        {
+            Console.WriteLine(message);
+        }
+    }
+
+    static bool IsPrime(int n)
+    {
+        if (n < 2) return false;
+        if (n == 2) return true;
+        if (n % 2 == 0) return false;
+
+        int boundary = (int)Math.Sqrt(n);
+
+        for (int i = 3; i <= boundary; i += 2)
+        {
+            if (n % i == 0) return false;
+        }
+
+        return true;
+    } 
+    #endregion
+
 }
 catch (Exception ex)
 {

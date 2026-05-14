@@ -76,10 +76,7 @@ public class AddressInfoFetcher
         throw new Exception("Lighter Api Key Index not found.");
     }
 
-    public async Task<string> GetDepositHistoryAsync(
-        long accountIndex,
-        string authToken,
-        CancellationToken cancellationToken = default)
+    public async Task<string> GetDepositHistoryAsync(long accountIndex, string authToken, CancellationToken cancellationToken = default)
     {
         try
         {
