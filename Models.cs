@@ -74,7 +74,7 @@ public class Models
         [JsonPropertyName("locked_balance")] public decimal? LockedBalance { get; set; }
     }
 
-    internal class LighterPoolInfo//TODO check response to see which should be nullable
+    internal class LighterPoolInfo
     {
         [JsonPropertyName("status")] public int? Status { get; set; }
         [JsonPropertyName("operator_fee")] public string OperatorFee { get; set; }
@@ -147,7 +147,6 @@ public class Models
         [JsonPropertyName("public_key")] public string PublicKey { get; set; }
         [JsonPropertyName("transaction_time")] public long TransactionTime { get; set; }
     }
-
     #endregion
     #endregion
 }

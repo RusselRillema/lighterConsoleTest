@@ -130,6 +130,29 @@ try
 
             WriteDebugLine("keyPublic is required.");
         }
+
+        LocalTestConfig config = new LocalTestConfig()
+        {
+            l1address = layer1Address,
+            apiSecret = keySecret,
+            apiPublic = keyPublic,
+            url = url,
+            chainId = chainId,
+        };
+
+        try
+        {
+            string configJson = JsonSerializer.Serialize<LocalTestConfig>(config);
+            File.WriteAllText(localConfigPath, configJson);
+            if(linuxTest)
+                File.WriteAllText("../../../" + localConfigPath, configJson);
+            else
+                File.WriteAllText("..\\..\\..\\"+localConfigPath, configJson);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Encountered exception when trying to save config json: {ex}");
+        }
     }
 
     var addressInfoFetcher = new AddressInfoFetcher(layer1Address, url);
@@ -276,7 +299,6 @@ try
         return true;
     } 
     #endregion
-
 }
 catch (Exception ex)
 {
