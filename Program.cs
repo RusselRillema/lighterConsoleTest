@@ -26,11 +26,13 @@ try
 
     if (linuxTest)
     {
+        localConfigPath = "../../../" + localConfigPath;
         Console.WriteLine("Running singer test for Linux.");
         Console.WriteLine($"Expected Dll name: {LighterNativeLinux.DllName}.");
     }
     else
     {
+        localConfigPath = "..\\..\\..\\" + localConfigPath;
         Console.WriteLine("Running singer test for Windows.");
         Console.WriteLine($"Expected Dll name: {LighterNativeWindows.DllName}.");
     }
