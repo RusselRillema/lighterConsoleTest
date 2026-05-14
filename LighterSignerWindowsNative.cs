@@ -4,7 +4,7 @@ namespace LighterTest
 {
     internal class LighterNativeWindows
     {
-        internal const string DllName = "..\\..\\..\\lighter-signer-windows-amd64.dll";
+        internal const string DllName = "lighter-signer-windows-amd64.dll";
 
         // typedef struct { char* str; char* err; } StrOrErr;
         [StructLayout(LayoutKind.Sequential)]

@@ -11,6 +11,12 @@
       <None Update="local.test.config.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+		<None Update="lighter-signer-windows-amd64.dll">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="lighter-signer-linux.so">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
     </ItemGroup>
 
 </Project>

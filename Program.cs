@@ -26,13 +26,11 @@ try
 
     if (linuxTest)
     {
-        localConfigPath = "../../../" + localConfigPath;
         Console.WriteLine("Running singer test for Linux.");
         Console.WriteLine($"Expected Dll name: {LighterNativeLinux.DllName}.");
     }
     else
     {
-        localConfigPath = "..\\..\\..\\" + localConfigPath;
         Console.WriteLine("Running singer test for Windows.");
         Console.WriteLine($"Expected Dll name: {LighterNativeWindows.DllName}.");
     }
@@ -131,6 +129,29 @@ try
             }
 
             WriteDebugLine("keyPublic is required.");
+        }
+
+        LocalTestConfig config = new LocalTestConfig()
+        {
+            l1address = layer1Address,
+            apiSecret = keySecret,
+            apiPublic = keyPublic,
+            url = url,
+            chainId = chainId,
+        };
+
+        try
+        {
+            string configJson = JsonSerializer.Serialize<LocalTestConfig>(config);
+            File.WriteAllText(localConfigPath, configJson);
+            if(linuxTest)
+                File.WriteAllText("../../../" + localConfigPath, configJson);
+            else
+                File.WriteAllText("..\\..\\..\\"+localConfigPath, configJson);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Encountered exception when trying to save config json: {ex}");
         }
     }
 
@@ -278,7 +299,6 @@ try
         return true;
     } 
     #endregion
-
 }
 catch (Exception ex)
 {
