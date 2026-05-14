@@ -1,21 +1,11 @@
-using System.Runtime.InteropServices;
 using LighterTest;
 using System.Text.Json;
-
-
-//NativeLibrary.Load(LighterNativeLinux.DllName);
 
 try
 {
     string defaultUrl = "https://mainnet.zklighter.elliot.ai/";
     int defaultChainId = 304;
     string localConfigPath = "local.test.config.json";
-    bool returnTokenOnly = false;
-
-    if (args.Length > 0 && bool.TryParse(args[0], out var parsedReturnTokenOnly))
-    {
-        returnTokenOnly = parsedReturnTokenOnly;
-    }
 
     string layer1Address;
     string url;
@@ -56,19 +46,13 @@ try
         url = string.IsNullOrWhiteSpace(config.url) ? defaultUrl : config.url;
         chainId = config.chainId ?? defaultChainId;
 
-        WriteDebugLine($"Loaded config from {localConfigPath}");
+        Console.WriteLine($"Loaded config from {localConfigPath}");
     }
     else
     {
-        if (returnTokenOnly)
-        {
-            throw new InvalidOperationException(
-                $"Config file '{localConfigPath}' is required when running in token-only mode.");
-        }
-
         while (true)
         {
-            WriteDebugLine("Enter layer1Address:");
+            Console.WriteLine("Enter layer1Address:");
             var layer1AddressInput = Console.ReadLine();
 
             if (!string.IsNullOrWhiteSpace(layer1AddressInput))
@@ -77,16 +61,16 @@ try
                 break;
             }
 
-            WriteDebugLine("layer1Address is required.");
+            Console.WriteLine("layer1Address is required.");
         }
 
-        WriteDebugLine($"Enter url (default: {defaultUrl}):");
+        Console.WriteLine($"Enter url (default: {defaultUrl}):");
         var urlInput = Console.ReadLine();
         url = string.IsNullOrWhiteSpace(urlInput) ? defaultUrl : urlInput;
 
         while (true)
         {
-            WriteDebugLine($"Enter chainId (default: {defaultChainId}):");
+            Console.WriteLine($"Enter chainId (default: {defaultChainId}):");
             var chainIdInput = Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(chainIdInput))
@@ -100,12 +84,12 @@ try
                 break;
             }
 
-            WriteDebugLine("Invalid chainId. Please enter a valid integer.");
+            Console.WriteLine("Invalid chainId. Please enter a valid integer.");
         }
 
         while (true)
         {
-            WriteDebugLine("Enter keySecret:");
+            Console.WriteLine("Enter keySecret:");
             var keySecretInput = Console.ReadLine();
 
             if (!string.IsNullOrWhiteSpace(keySecretInput))
@@ -114,12 +98,12 @@ try
                 break;
             }
 
-            WriteDebugLine("keySecret is required.");
+            Console.WriteLine("keySecret is required.");
         }
 
         while (true)
         {
-            WriteDebugLine("Enter keyPublic:");
+            Console.WriteLine("Enter keyPublic:");
             var keyPublicInput = Console.ReadLine();
 
             if (!string.IsNullOrWhiteSpace(keyPublicInput))
@@ -128,7 +112,7 @@ try
                 break;
             }
 
-            WriteDebugLine("keyPublic is required.");
+            Console.WriteLine("keyPublic is required.");
         }
 
         LocalTestConfig config = new LocalTestConfig()
@@ -144,10 +128,10 @@ try
         {
             string configJson = JsonSerializer.Serialize<LocalTestConfig>(config);
             File.WriteAllText(localConfigPath, configJson);
-            if(linuxTest)
+            if (linuxTest)
                 File.WriteAllText("../../../" + localConfigPath, configJson);
             else
-                File.WriteAllText("..\\..\\..\\"+localConfigPath, configJson);
+                File.WriteAllText("..\\..\\..\\" + localConfigPath, configJson);
         }
         catch (Exception ex)
         {
@@ -159,8 +143,8 @@ try
     long accountIndex = await addressInfoFetcher.GetAccountIndexAsync();
     short apiKeyIndex = await addressInfoFetcher.GetApiKeyIndexAsync(accountIndex, keyPublic);
 
-    WriteDebugLine($"AccountIndex: {accountIndex}");
-    WriteDebugLine($"ApiKeyIndex: {apiKeyIndex}");
+    Console.WriteLine($"AccountIndex: {accountIndex}");
+    Console.WriteLine($"ApiKeyIndex: {apiKeyIndex}");
 
 
     string token = "";
@@ -189,11 +173,6 @@ try
     }
 
     await Task.Delay(1000);
-
-    if (returnTokenOnly)
-    {
-        return;
-    }
 
     try
     {
@@ -273,36 +252,26 @@ try
         if (input != null)
             break;
     }
-
-    #region Helper methods
-    void WriteDebugLine(string message)
-    {
-        if (!returnTokenOnly)
-        {
-            Console.WriteLine(message);
-        }
-    }
-
-    static bool IsPrime(int n)
-    {
-        if (n < 2) return false;
-        if (n == 2) return true;
-        if (n % 2 == 0) return false;
-
-        int boundary = (int)Math.Sqrt(n);
-
-        for (int i = 3; i <= boundary; i += 2)
-        {
-            if (n % i == 0) return false;
-        }
-
-        return true;
-    } 
-    #endregion
 }
 catch (Exception ex)
 {
     Console.WriteLine($"Caught exception in console test: {ex}");
+}
+
+static bool IsPrime(int n)
+{
+    if (n < 2) return false;
+    if (n == 2) return true;
+    if (n % 2 == 0) return false;
+
+    int boundary = (int)Math.Sqrt(n);
+
+    for (int i = 3; i <= boundary; i += 2)
+    {
+        if (n % i == 0) return false;
+    }
+
+    return true;
 }
 
 sealed class LocalTestConfig
