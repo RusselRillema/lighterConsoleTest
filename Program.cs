@@ -148,7 +148,7 @@ try
 
 
     string token = "";
-    var expiryTime = DateTime.UtcNow.AddSeconds(28200); //7 hours and 50 minutes
+    var expiryTime = DateTime.UtcNow.AddHours(7).AddMinutes(50);
     long deadline = Convert.ToInt64((expiryTime - new DateTime(1970, 01, 01)).TotalSeconds);
     try
     {

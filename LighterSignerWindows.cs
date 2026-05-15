@@ -4,26 +4,8 @@ namespace LighterTest
 {
     internal static class LighterSignerWindows
     {
-
-        // ----- helpers ----------------------------------------------------
-        private static string TakeString(IntPtr p)
-        {
-            if (p == IntPtr.Zero) return null;
-            try { return Marshal.PtrToStringAnsi(p); }
-            finally { LighterNativeWindows.Free(p); }
-        }
-
-        private static void ThrowIfError(IntPtr errPtr)
-        {
-            if (errPtr == IntPtr.Zero) return;
-            string msg = Marshal.PtrToStringAnsi(errPtr) ?? "unknown error";
-            LighterNativeWindows.Free(errPtr);
-            throw new LighterException(msg);
-        }
-
         private static void ThrowIfCharPtrError(IntPtr errPtr)
         {
-            // Functions that return a bare char* use non-null == error, null == success.
             if (errPtr == IntPtr.Zero) return;
             string msg = Marshal.PtrToStringAnsi(errPtr) ?? "unknown error";
             LighterNativeWindows.Free(errPtr);
@@ -32,14 +14,11 @@ namespace LighterTest
 
         private static LighterSignedTx Unpack(LighterNativeWindows.SignedTxResponse r)
         {
-            // Always drain every char* the DLL handed us so nothing leaks,
-            // even if one of them is an error.
             string err = r.err != IntPtr.Zero ? Marshal.PtrToStringAnsi(r.err) : null;
             string txInfo = r.txInfo != IntPtr.Zero ? Marshal.PtrToStringAnsi(r.txInfo) : null;
             string txHash = r.txHash != IntPtr.Zero ? Marshal.PtrToStringAnsi(r.txHash) : null;
             string msg2Sig = r.messageToSign != IntPtr.Zero ? Marshal.PtrToStringAnsi(r.messageToSign) : null;
 
-            //Why is txType not freed?
             if (r.err != IntPtr.Zero) LighterNativeWindows.Free(r.err);
             if (r.txInfo != IntPtr.Zero) LighterNativeWindows.Free(r.txInfo);
             if (r.txHash != IntPtr.Zero) LighterNativeWindows.Free(r.txHash);
@@ -50,8 +29,6 @@ namespace LighterTest
 
             return new LighterSignedTx(r.txType, txInfo, txHash, msg2Sig);
         }
-
-        // ----- public API -------------------------------------------------
 
         public static ApiKey GenerateApiKey()
         {
@@ -69,7 +46,6 @@ namespace LighterTest
             return new ApiKey(priv, pub);
         }
 
-        /// <summary>Initialises an internal signer client. Must be called before signing.</summary>
         public static string CreateClient(string url, string privateKey, int chainId, int apiKeyIndex, long accountIndex)
         {
             IntPtr p = LighterNativeWindows.CreateClient(url, privateKey, chainId, apiKeyIndex, accountIndex);
@@ -77,7 +53,6 @@ namespace LighterTest
             return p.ToString();
         }
 
-        /// <summary>Returns without throwing if a client for (apiKeyIndex, accountIndex) exists.</summary>
         public static void CheckClient(int apiKeyIndex, long accountIndex)
         {
             IntPtr p = LighterNativeWindows.CheckClient(apiKeyIndex, accountIndex);

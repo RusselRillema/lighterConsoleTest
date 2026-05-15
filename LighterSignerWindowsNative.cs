@@ -52,9 +52,7 @@ namespace LighterTest
         //     uint32_t TriggerPrice;
         //     int64_t  OrderExpiry;
         // } CreateOrderTxReq;
-        //
-        // Pack=1 to match the Go-side struct layout exactly (cgo emits no padding
-        // hints, but Go packs these fields tightly; using Pack=1 is the safe match).
+
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         internal struct CreateOrderTxReq
         {
@@ -71,9 +69,6 @@ namespace LighterTest
         }
 
         // ----- Exported functions ------------------------------------------------
-        // All string inputs are marshalled as ANSI (the Go side expects char*/
-        // UTF-8; plain ASCII hex / URLs pass through identically, and
-        // CharSet.Ansi avoids unwanted wide-char marshalling).
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         internal static extern ApiKeyResponse GenerateAPIKey();
@@ -289,7 +284,6 @@ namespace LighterTest
         internal static extern void Free(IntPtr ptr);
     }
 
-    //James - is this needed, doesn't extend base class
     // ---------------------------------------------------------------------
     // Managed result types
     // ---------------------------------------------------------------------

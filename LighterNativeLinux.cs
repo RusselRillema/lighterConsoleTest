@@ -2,14 +2,11 @@ using System.Runtime.InteropServices;
 
 namespace LighterTest;
 
-
 public static class LighterNativeLinux
 {
    public const string DllName = "lighter-signer-linux.so";
 
-    // ── Native structs (must mirror the CGO C struct layout exactly) ────
-
-    /// <summary>Mirrors: typedef struct { char* str; char* err; } StrOrErr;</summary>
+    //typedef struct { char* str; char* err; } StrOrErr;
     [StructLayout(LayoutKind.Sequential)]
     internal struct NativeStrOrErr
     {
@@ -23,13 +20,7 @@ public static class LighterNativeLinux
         public string? Err { get; init; }
     }
     
-    /// <summary>
-    /// Mirrors:
-    /// typedef struct { uint8_t txType; char* txInfo; char* txHash;
-    ///                  char* messageToSign; char* err; } SignedTxResponse;
-    /// On arm64 Linux, the byte field is followed by 7 bytes of padding before
-    /// the first pointer — Sequential with default (natural) alignment handles this.
-    /// </summary>
+    // typedef struct { uint8_t txType; char* txInfo; char* txHash; char* messageToSign; char* err; } SignedTxResponse;
     [StructLayout(LayoutKind.Sequential)]
     internal struct NativeSignedTxResponse
     {
@@ -40,7 +31,7 @@ public static class LighterNativeLinux
         public IntPtr Err;
     }
 
-    /// <summary>Mirrors: typedef struct { char* privateKey; char* publicKey; char* err; } ApiKeyResponse;</summary>
+    //typedef struct { char* privateKey; char* publicKey; char* err; } ApiKeyResponse;
     [StructLayout(LayoutKind.Sequential)]
     internal struct NativeApiKeyResponse
     {
@@ -150,8 +141,6 @@ public static class LighterNativeLinux
         int cApiKeyIndex,
         long cAccountIndex);
 
-    // Note: the Linux header uses `long long unsigned int` for cAmount —
-    // semantically identical to `unsigned long long` (ulong in C#).
     [DllImport(DllName, EntryPoint = "SignWithdraw", CallingConvention = CallingConvention.Cdecl)]
     internal static extern NativeSignedTxResponse SignWithdraw(
         int cAssetIndex,
@@ -303,10 +292,6 @@ public static class LighterNativeLinux
         int cApiKeyIndex,
         long cAccountIndex);
 
-    /// <summary>
-    /// Frees a pointer that was allocated by Go/CGO.
-    /// Must be called for every non-null IntPtr returned inside a native struct.
-    /// </summary>
     [DllImport(DllName, EntryPoint = "Free", CallingConvention = CallingConvention.Cdecl)]
     internal static extern void Free(IntPtr ptr);
 }
